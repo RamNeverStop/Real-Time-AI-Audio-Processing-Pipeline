@@ -54,28 +54,20 @@ The pipeline is modeled after the architectures used in:
 
 ## Architecture
 
-```
-┌──────────────────────────────────────────────────────────────┐
-│                        CAPTURE THREAD                        │
-│                                                              │
-│  Microphone → [48 kHz raw] → Low-Pass (1 kHz) →             │
-│  Downsample → [6 kHz] → Circular Buffer (write)             │
-└───────────────────────────┬──────────────────────────────────┘
-                            │  mutex + condition_variable
-┌───────────────────────────▼──────────────────────────────────┐
-│                       PLAYBACK THREAD                        │
-│                                                              │
-│  Circular Buffer (read) → [6 kHz] → ┌──────────────────┐   │
-│                                      │  AI MODEL (ONNX, │   │
-│                                      │  HiFi-GAN, etc.) │   │
-│                                      └────────┬─────────┘   │
-│  Upsample → [48 kHz] → Low-Pass (2 kHz) → Speaker           │
-└──────────────────────────────────────────────────────────────┘
-![Uploading image.png…]()
-![Uploading image.png…]()
-![Uploading image.png…]()
-![Uploading image.png…]()
+![Workflow with AI](assets/workflow.png)
 
+> **Flow:** Microphone audio → Downsample to low rate (6 kHz) → AI generates enhanced audio → Upsample to high rate (48 kHz) → Playback at full sample rate
+
+The two-thread implementation maps directly onto this diagram:
+
+```
+CAPTURE THREAD:   Mic (48 kHz) ──► Low-Pass Filter ──► Downsample (6 kHz) ──► Circular Buffer
+                                                                                       │
+PLAYBACK THREAD:                                              ┌────────────────────────┘
+                                                              ▼
+                                                    [AI Model Inference]
+                                                              │
+                                              Upsample (48 kHz) ──► Low-Pass Filter ──► Speaker
 ```
 
 ---
