@@ -71,6 +71,11 @@ The pipeline is modeled after the architectures used in:
 │                                      └────────┬─────────┘   │
 │  Upsample → [48 kHz] → Low-Pass (2 kHz) → Speaker           │
 └──────────────────────────────────────────────────────────────┘
+![Uploading image.png…]()
+![Uploading image.png…]()
+![Uploading image.png…]()
+![Uploading image.png…]()
+
 ```
 
 ---
